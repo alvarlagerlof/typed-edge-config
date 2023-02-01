@@ -10,11 +10,11 @@ export default async function Home() {
     heloo: z.string().default("default hello"),
   });
 
-  schema.parse(config);
+  const parsed = schema.parse(config);
 
   return (
     <main>
-      <pre>{JSON.stringify(config, null, 2)}</pre>
+      <pre>{JSON.stringify(parsed, null, 2)}</pre>
     </main>
   );
 }
