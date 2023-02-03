@@ -8,7 +8,9 @@ const schema = z
   .object({
     firstName: z.string(),
     lastName: z.string(),
-    age: z.number(),
+    email: z.string().email(),
+    age: z.number().min(18),
+    fulfilled: z.boolean(),
   })
   .required();
 

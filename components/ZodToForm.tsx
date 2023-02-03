@@ -1,14 +1,17 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z, ZodNumber } from "zod";
+import { z, ZodBoolean, ZodNumber, ZodString } from "zod";
 
 interface Props<T> {
   schema: z.ZodType<T>;
 }
 
 export function ZodToForm<T>({ schema }: Props<T>) {
+  const [data, setData] = useState<z.infer<typeof schema>>();
+
   const {
     register,
     handleSubmit,
@@ -20,33 +23,64 @@ export function ZodToForm<T>({ schema }: Props<T>) {
   const { shape } = schema;
 
   return (
-    <form
-      onSubmit={handleSubmit((d) => console.log(d))}
-      className="flex flex-col gap-4"
-    >
-      {Object.entries(shape).map(([key, value]) => {
-        return (
-          <>
-            <label className="flex flex-col gap-1">
-              <span>{key}</span>
-              <input
-                key={key}
-                {...register(key, {
-                  valueAsNumber: value instanceof ZodNumber,
-                })}
-                className="rounded border border-1 border-neutral-300 p-2 bg-neutral-100"
-              />
-            </label>
+    <>
+      <form
+        onSubmit={handleSubmit((result) => setData(result))}
+        className="flex flex-col gap-4"
+      >
+        {Object.entries(shape).map(([key, value]) => {
+          if (value instanceof ZodNumber || value instanceof ZodString) {
+            return (
+              <div key={key} className="flex flex-col gap-2">
+                <label className="flex flex-col gap-1">
+                  <span>{key}</span>
+                  <input
+                    {...register(key, {
+                      valueAsNumber: value instanceof ZodNumber,
+                    })}
+                    className="rounded border border-1 border-neutral-300 p-2 bg-neutral-100"
+                  />
+                </label>
 
-            {errors[key]?.message && <p>{errors[key]?.message.toString()}</p>}
-          </>
-        );
-      })}
+                {errors[key]?.message && (
+                  <p className="text-sm text-red-600">
+                    {errors[key]?.message.toString()}{" "}
+                  </p>
+                )}
+              </div>
+            );
+          }
 
-      <input
-        type="submit"
-        className="bg-black rounded p-3 text-white border-neutral-600"
-      />
-    </form>
+          if (value instanceof ZodBoolean) {
+            return (
+              <div key={key} className="flex flex-col gap-2">
+                <label className="flex flex-col gap-1 items-start">
+                  <span>{key}</span>
+                  <input type="checkbox" {...register(key, {})} />
+                </label>
+                {errors[key]?.message && (
+                  <p className="text-sm text-red-600">
+                    {errors[key]?.message.toString()}
+                  </p>
+                )}
+              </div>
+            );
+          }
+        })}
+
+        <input
+          type="submit"
+          className="bg-black rounded p-3 text-white border-neutral-600"
+        />
+      </form>
+      {data ? (
+        <div className="flex flex-col gap-1">
+          <p>Result</p>
+          <pre className="rounded border border-1 border-neutral-300 p-2 bg-neutral-100">
+            {JSON.stringify(data, null, 2)}
+          </pre>
+        </div>
+      ) : null}
+    </>
   );
 }
