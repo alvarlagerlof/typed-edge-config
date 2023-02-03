@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z, ZodBoolean, ZodNumber, ZodString } from "zod";
+import { z, ZodBoolean, ZodNumber, ZodObject, ZodString } from "zod";
 
 interface Props<T> {
   schema: z.ZodType<T>;
@@ -28,51 +28,7 @@ export function ZodToForm<T>({ schema }: Props<T>) {
         onSubmit={handleSubmit((result) => setData(result))}
         className="flex flex-col gap-4"
       >
-        {Object.entries(shape).map(([key, value]) => {
-          if (value instanceof ZodNumber || value instanceof ZodString) {
-            return (
-              <div key={key} className="flex flex-col gap-2">
-                <label className="flex flex-col gap-1">
-                  <span>{key}</span>
-                  <input
-                    {...register(key, {
-                      valueAsNumber: value instanceof ZodNumber,
-                    })}
-                    className="rounded border border-1 border-neutral-300 p-2 bg-neutral-100"
-                  />
-                </label>
-
-                {errors[key]?.message && (
-                  <p className="text-sm text-red-600">
-                    {errors[key]?.message.toString()}{" "}
-                  </p>
-                )}
-              </div>
-            );
-          }
-
-          if (value instanceof ZodBoolean) {
-            return (
-              <div key={key} className="flex flex-col gap-2">
-                <label className="flex flex-col gap-1 items-start">
-                  <span>{key}</span>
-                  <input type="checkbox" {...register(key, {})} />
-                </label>
-                {errors[key]?.message && (
-                  <p className="text-sm text-red-600">
-                    {errors[key]?.message.toString()}
-                  </p>
-                )}
-              </div>
-            );
-          }
-
-          return (
-            <p key={key} className="text-sm text-amber-600">
-              Unhandled type {value.constructor.name}
-            </p>
-          );
-        })}
+        <RenderZodObject object={shape} errors={errors} register={register} />
 
         <input
           type="submit"
@@ -88,5 +44,71 @@ export function ZodToForm<T>({ schema }: Props<T>) {
         </div>
       ) : null}
     </>
+  );
+}
+
+function RenderZodObject({ object, errors, register }) {
+  return (
+    <div className="flex flex-col gap-4">
+      {Object.entries(object).map(([key, value]) => {
+        if (value instanceof ZodNumber || value instanceof ZodString) {
+          return (
+            <div key={key} className="flex flex-col gap-2">
+              <label className="flex flex-col gap-1">
+                <span>{key}</span>
+                <input
+                  {...register(key, {
+                    valueAsNumber: value instanceof ZodNumber,
+                  })}
+                  className="rounded border border-1 border-neutral-300 p-2 bg-neutral-100"
+                />
+              </label>
+
+              {errors[key]?.message && (
+                <p className="text-sm text-red-600">
+                  {errors[key]?.message.toString()}{" "}
+                </p>
+              )}
+            </div>
+          );
+        }
+
+        if (value instanceof ZodBoolean) {
+          return (
+            <div key={key} className="flex flex-col gap-2">
+              <label className="flex flex-col gap-1 items-start">
+                <span>{key}</span>
+                <input type="checkbox" {...register(key, {})} />
+              </label>
+              {errors[key]?.message && (
+                <p className="text-sm text-red-600">
+                  {errors[key]?.message.toString()}
+                </p>
+              )}
+            </div>
+          );
+        }
+
+        if (value instanceof ZodObject) {
+          return (
+            <div className="rounded border border-1 border-neutral-300 p-4 flex flex-col gap-3">
+              <p>{key}</p>
+              <RenderZodObject
+                key={key}
+                object={value._def.shape()}
+                errors={errors}
+                register={register}
+              />
+            </div>
+          );
+        }
+
+        return (
+          <p key={key} className="text-sm text-amber-600">
+            Unhandled type {value?.constructor?.name ?? "no"}
+          </p>
+        );
+      })}
+    </div>
   );
 }

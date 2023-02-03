@@ -14,6 +14,10 @@ const schema = z
     nested: z.object({
       foo: z.string(),
       bar: z.string(),
+      deeply: z.object({
+        foo: z.string(),
+        bar: z.string(),
+      }),
     }),
   })
   .required();
