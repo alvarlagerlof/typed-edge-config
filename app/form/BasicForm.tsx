@@ -11,6 +11,10 @@ const schema = z
     email: z.string().email(),
     age: z.number().min(18),
     fulfilled: z.boolean(),
+    nested: z.object({
+      foo: z.string(),
+      bar: z.string(),
+    }),
   })
   .required();
 

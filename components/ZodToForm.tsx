@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z, ZodBoolean, ZodNumber, ZodString } from "zod";
 
@@ -66,6 +66,8 @@ export function ZodToForm<T>({ schema }: Props<T>) {
               </div>
             );
           }
+
+          return <p key={key}>Unhandled type {value.constructor.name}</p>;
         })}
 
         <input
