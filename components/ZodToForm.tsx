@@ -67,7 +67,11 @@ export function ZodToForm<T>({ schema }: Props<T>) {
             );
           }
 
-          return <p key={key}>Unhandled type {value.constructor.name}</p>;
+          return (
+            <p key={key} className="text-sm text-amber-600">
+              Unhandled type {value.constructor.name}
+            </p>
+          );
         })}
 
         <input
