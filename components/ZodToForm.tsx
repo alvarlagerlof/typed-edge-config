@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z, ZodBoolean, ZodNumber, ZodObject, ZodString } from "zod";
 
 interface Props<T> {
-  schema: z.ZodType<T>;
+  schema: z.ZodSchema<T>;
 }
 
 export function ZodToForm<T>({ schema }: Props<T>) {
@@ -20,15 +20,17 @@ export function ZodToForm<T>({ schema }: Props<T>) {
     resolver: zodResolver(schema),
   });
 
-  const { shape } = schema;
-
   return (
     <>
       <form
         onSubmit={handleSubmit((result) => setData(result))}
         className="flex flex-col gap-4"
       >
-        <RenderZodObject object={shape} errors={errors} register={register} />
+        <RenderZodObject
+          object={schema._def.shape()}
+          errors={errors}
+          register={register}
+        />
 
         <input
           type="submit"
