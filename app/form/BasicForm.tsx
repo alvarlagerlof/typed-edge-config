@@ -14,14 +14,14 @@ const schema = z
     favoriteDotComSite: z
       .string()
       .endsWith(".com", { message: "Only .com domains allowed" }),
-    nested: z.object({
-      foo: z.string().describe("This is a description!"),
-      bar: z.string(),
-      deeply: z.object({
-        foo: z.string(),
-        bar: z.string(),
-      }),
-    }),
+    // nested: z.object({
+    //   foo: z.string().describe("This is a description!"),
+    //   bar: z.string(),
+    //   deeply: z.object({
+    //     foo: z.string(),
+    //     bar: z.string(),
+    //   }),
+    // }),
   })
   .required();
 
