@@ -57,7 +57,13 @@ function RenderZodObject({ object, errors, register }) {
           return (
             <div key={key} className="flex flex-col gap-2">
               <label className="flex flex-col gap-1">
-                <span>{key}</span>
+                <div className="flex flex-row justify-between">
+                  <span>{key}</span>
+                  {value.description ? (
+                    <span className="text-sm">{value.description}</span>
+                  ) : null}
+                </div>
+
                 <input
                   {...register(key, {
                     valueAsNumber: value instanceof ZodNumber,

@@ -9,10 +9,10 @@ const schema = z
     firstName: z.string(),
     lastName: z.string(),
     email: z.string().email(),
-    age: z.number().min(18),
+    age: z.number().min(18).describe("Has a limit"),
     fulfilled: z.boolean(),
     nested: z.object({
-      foo: z.string(),
+      foo: z.string().describe("This is a description!"),
       bar: z.string(),
       deeply: z.object({
         foo: z.string(),
