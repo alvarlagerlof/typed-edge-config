@@ -6,7 +6,8 @@ import { ZodToForm } from "@/components/ZodToForm";
 
 const schema = z
   .object({
-    name: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
     age: z.number(),
   })
   .required();
