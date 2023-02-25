@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldValue, useForm } from "react-hook-form";
 import { z, ZodBoolean, ZodNumber, ZodObject, ZodString } from "zod";
 
 interface Props<T> {
@@ -23,11 +23,13 @@ export function ZodToForm<T>({ schema }: Props<T>) {
   return (
     <>
       <form
-        onSubmit={handleSubmit((result) => setData(result))}
+        onSubmit={handleSubmit((result) =>
+          setData(result as z.infer<typeof schema>)
+        )}
         className="flex flex-col gap-4"
       >
         <RenderZodObject
-          object={schema._def.shape()}
+          object={schema._def}
           errors={errors}
           register={register}
         />
@@ -49,7 +51,15 @@ export function ZodToForm<T>({ schema }: Props<T>) {
   );
 }
 
-function RenderZodObject({ object, errors, register }) {
+function RenderZodObject({
+  object,
+  errors,
+  register,
+}: {
+  object: any;
+  errors: any;
+  register: any;
+}) {
   return (
     <div className="flex flex-col gap-4">
       {Object.entries(object).map(([key, value]) => {
@@ -99,7 +109,10 @@ function RenderZodObject({ object, errors, register }) {
 
         if (value instanceof ZodObject) {
           return (
-            <div className="rounded border border-1 border-neutral-300 p-4 flex flex-col gap-3">
+            <div
+              className="rounded border border-1 border-neutral-300 p-4 flex flex-col gap-3"
+              key={key}
+            >
               <p>{key}</p>
               <RenderZodObject
                 key={key}
